@@ -12,78 +12,67 @@ public class MinPQWeightedEdge {
             resize();
         }
 
-        //index of last value is size-1
-        //parent index is floor of (i-1)/2 or if i = 0 then i is the root and there is no parent
-        //for last value, do (size-2)/2
-
         int currIndex = size;
         minheap[size++] = edge;
-        //covers if we are adding the first value to the queue
-        int parentIndex = Math.max(0,(currIndex-1)/2);
 
-        WeightedEdge parent = minheap[parentIndex];
-        WeightedEdge curr = minheap[currIndex];
-        while (curr.compareTo(parent) < 0 && curr!=minheap[0]){
-            curr = minheap[currIndex];
-            parent = minheap[parentIndex];
+        boolean needsSwap = true;
+        while (currIndex>0 && needsSwap){
+            int parentIndex = (currIndex-1)/2;
 
-//            WeightedEdge temp = edge;
-//            edge = parent;
-//            parent = temp;
+            WeightedEdge parent = minheap[parentIndex];
+            WeightedEdge curr = minheap[currIndex];
 
-            minheap[currIndex] = parent;
-            minheap[parentIndex] = curr;
+            if (curr.compareTo(parent)>=0){
+                needsSwap = false;
+            } else {
+                minheap[currIndex] = parent;
+                minheap[parentIndex] = curr;
 
-            currIndex = parentIndex;
-            parentIndex = (currIndex-1)/2;
-
+                currIndex = parentIndex;
+            }
         }
-
-
-        //takes a weighted edge and adds it to the minimum priority queue
-        //use the algorithm from the notes to insert it, inc the size
-        //return if it was successful
     }
 
     public WeightedEdge retrieveMin(){
-        WeightedEdge temp = minheap[0];
-        minheap[0] = minheap[--size];
+        WeightedEdge min = null;
 
-        //index of children for a parent at index i:
-        //2i + 1 = left child
-        //2i + 2 = right child
-        int index = 0;
+        if (!isEmpty()){
+            min = minheap[0]; //grab the root (smallest) element
+            minheap[0] = minheap[--size]; //decrement the size and grab the last element
+            minheap[size] = null; //set the previous last element to null
 
-        while ((minheap[2*index+1]!=null && minheap[index].compareTo(minheap[2*index+1]) > 0) || (minheap[2*index+2]!=null && minheap[index].compareTo(minheap[2*index+2]) > 0)){
-            WeightedEdge curr;
+            boolean swap = true;
+            int index = 0;
 
-            if (minheap[2*index+1]==null){
-                curr = minheap[index];
-                minheap[index] = minheap[2*index+2];
-                minheap[2*index+2] = curr;
-            } else if (minheap[2*index+2]==null){
-                curr = minheap[index];
-                minheap[index] = minheap[2*index+1];
-                minheap[2*index+1] = curr;
+            while (swap){
+                int leftChild = 2*index + 1;
+                int rightChild = 2*index + 2;
+                int currIndex = index;
 
-            } else {
-                if (minheap[2*index+1].compareTo(minheap[2*index+2]) > 0){
-                    curr = minheap[2*index+2];
-                    minheap[2*index+2] = minheap[2*index+1];
-                    minheap[2*index+1] = curr;
-
-                    index = 2*index+1;
-                } else {
-                    curr = minheap[2*index+1];
-                    minheap[2*index+1] = minheap[2*index+2];
-                    minheap[2*index+2] = curr;
-
-                    index = 2*index+2;
+                //important to use 2 if statements as if the right child is smaller than its sibling, we can
+                //switch the indices to ensure that we are taking the smallest child to maintain the min heap structure
+                if (leftChild<size && minheap[leftChild].compareTo(minheap[currIndex])<0){
+                    currIndex = leftChild;
                 }
+
+                if (rightChild < size && minheap[rightChild].compareTo(minheap[currIndex])<0){
+                    currIndex = rightChild;
+                }
+
+                if (currIndex!=index){
+                    WeightedEdge temp = minheap[index];
+                    minheap[index] = minheap[currIndex];
+                    minheap[currIndex] = temp;
+                    index = currIndex;
+
+                } else {
+                    swap = false;
+                }
+
             }
         }
 
-        return temp;
+        return min;
     }
 
     public boolean isEmpty(){

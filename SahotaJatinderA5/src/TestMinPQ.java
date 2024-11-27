@@ -10,7 +10,10 @@ public class TestMinPQ {
 	runAllTests();
     }
 
-    static public void setupTestEdges() {
+	private static void testMST() {
+	}
+
+	static public void setupTestEdges() {
 	int testWeights[] = new int[]{76, 89, 95, 13, 22, 1, 63, 16, 14, 31};
 	
 	testEdges = new WeightedEdge[TEST_SIZE];    
@@ -42,6 +45,7 @@ public class TestMinPQ {
 	    WeightedEdge minEdge = testPQ.retrieveMin();
 	    System.out.println("New array contents:");
 	    testPQ.print();
+		System.out.println("Retrieved min: "+minEdge);
 	}
     }
 }
